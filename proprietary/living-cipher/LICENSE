@@ -1,0 +1,38 @@
+Living Cipher — Proprietary License
+Copyright (c) 2026
+
+All rights reserved.
+
+GRANT OF LICENSE
+This software and associated documentation files (the "Software") may be used
+only under explicit written permission from the copyright holder.
+
+RESTRICTIONS
+No redistribution, sublicensing, modification, or public hosting is permitted
+without prior written authorization.
+
+PROHIBITED USES
+The following uses are explicitly prohibited and will result in immediate
+license termination:
+
+1. Training machine learning models on Software outputs
+2. Adding personalization or user profiling features
+3. Implementing engagement or arousal optimization
+4. Creating realism escalation tiers or features
+5. Persisting or storing user inputs beyond ephemeral processing
+6. Bypassing or modifying ethical invariants
+7. Removing or altering the Ethics Anchor verification
+
+ETHICS BINDING
+This license is bound to Ethics Anchor (SHA-256):
+65b14d584f5a5fd070fe985eeb86e14cb3ce56a4fc41fd9e987f2259fe1f15c1
+
+Any modification to the ethical invariants documented in the anchor
+automatically terminates this license.
+
+TERMINATION
+Violations of any restriction or prohibited use immediately terminate
+all rights granted under this license.
+
+NO WARRANTY
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.

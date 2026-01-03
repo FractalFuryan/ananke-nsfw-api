@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ananke — Abstract Preview</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      background: #1a1a1a;
+      color: #fff;
+      font-family: monospace;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    canvas {
+      border: 1px solid #444;
+      background: #000;
+    }
+    .controls {
+      margin-top: 20px;
+    }
+    input {
+      padding: 8px;
+      margin-right: 10px;
+      font-family: monospace;
+    }
+    button {
+      padding: 8px 16px;
+      font-family: monospace;
+      cursor: pointer;
+    }
+    .info {
+      margin-top: 20px;
+      max-width: 640px;
+      opacity: 0.7;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Ananke Abstract Preview</h1>
+  <canvas id="c" width="640" height="640"></canvas>
+  
+  <div class="controls">
+    <input type="text" id="nonce" value="demo-seed" placeholder="Enter nonce">
+    <button onclick="render()">Generate</button>
+  </div>
+  
+  <div class="info">
+    <p>⚠️ Abstract geometry only. No storage. No analytics. Deterministic from seed.</p>
+    <p>Ethics Anchor: 65b14d584f5a5fd070fe985eeb86e14cb3ce56a4fc41fd9e987f2259fe1f15c1</p>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("c");
+    const ctx = canvas.getContext("2d");
+    
+    async function render() {
+      const nonce = document.getElementById("nonce").value;
+      
+      try {
+        const response = await fetch("/v1/generate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ nonce })
+        });
+        
+        const data = await response.json();
+        
+        // Clear canvas
+        ctx.clearRect(0, 0, 640, 640);
+        
+        // Draw abstract circle based on geometry
+        ctx.strokeStyle = "#00ff00";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        const radius = 100 + data.geometry.curvature * 200;
+        ctx.arc(320, 320, radius, 0, 2 * Math.PI);
+        ctx.stroke();
+        
+        // Draw symmetry markers
+        ctx.strokeStyle = "#0088ff";
+        ctx.lineWidth = 1;
+        const order = data.geometry.symmetry_order;
+        for (let i = 0; i < order; i++) {
+          const angle = (2 * Math.PI / order) * i;
+          ctx.beginPath();
+          ctx.moveTo(320, 320);
+          ctx.lineTo(
+            320 + Math.cos(angle) * radius,
+            320 + Math.sin(angle) * radius
+          );
+          ctx.stroke();
+        }
+        
+        console.log("Generated:", data.geometry);
+      } catch (err) {
+        console.error("Generation failed:", err);
+      }
+    }
+    
+    // Initial render
+    render();
+  </script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+# No external dependencies for core generator
+# Pure Python implementation
+
+pytest>=7.4.0

@@ -1,0 +1,81 @@
+name: Ethics Drift Gate
+
+on: [push, pull_request]
+
+jobs:
+  ethics-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify ethics anchor (SHA-256)
+        run: |
+          EXPECTED="65b14d584f5a5fd070fe985eeb86e14cb3ce56a4fc41fd9e987f2259fe1f15c1"
+          FOUND=$(grep "Anchor (SHA" README.md | awk '{print $3}')
+          if [ "$FOUND" != "$EXPECTED" ]; then
+            echo "❌ Ethics anchor mismatch"
+            exit 1
+          fi
+          echo "✓ Ethics anchor verified in README"
+          
+          # Verify in codebase
+          COUNT=$(grep -r "$EXPECTED" . --include="*.py" --include="*.md" | wc -l)
+          if [ "$COUNT" -lt 3 ]; then
+            echo "❌ Ethics anchor not found in enough locations ($COUNT < 3)"
+            exit 1
+          fi
+          echo "✓ Ethics anchor found in $COUNT locations"
+
+      - name: Enforce scope-wide invariants
+        run: |
+          FORBIDDEN=(
+            "train(" "fit(" "fine_tune"
+            "reinforcement" "reward_model"
+            "engagement" "retention" "arousal"
+            "profile" "personalize"
+          )
+          for word in "${FORBIDDEN[@]}"; do
+            if grep -R "$word" api generator nft render_gpu worker 2>/dev/null | grep -v "FORBIDDEN" | grep -v test | grep -v addiction_metrics; then
+              echo "❌ Forbidden concept detected: $word"
+              exit 1
+            fi
+          done
+          echo "✓ No forbidden concepts in core layers"
+
+      - name: Enforce realism ceiling
+        run: |
+          if grep -R "photoreal\|skin\|eyes\|face\|pose" generator api render_gpu 2>/dev/null | grep -v "FORBIDDEN" | grep -v test | grep -v guards; then
+            echo "❌ Realism terms detected"
+            exit 1
+          fi
+          echo "✓ Realism ceiling enforced"
+      
+      - name: Check for ML frameworks
+        run: |
+          if grep -E "torch|tensorflow|keras|sklearn" */requirements.txt 2>/dev/null; then
+            echo "❌ ML framework detected in dependencies"
+            exit 1
+          fi
+          echo "✓ No ML frameworks"
+      
+      - name: Check for analytics SDKs
+        run: |
+          if grep -E "google-analytics|mixpanel|segment|amplitude" */requirements.txt 2>/dev/null; then
+            echo "❌ Analytics SDK detected"
+            exit 1
+          fi
+          echo "✓ No analytics SDKs"
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Run core tests
+        run: |
+          cd open/ananke-core
+          pip install -r requirements.txt
+          pytest -v tests/
+
+      - name: Ethics gate passed
+        run: echo "✅ Ethics invariants intact across all layers"

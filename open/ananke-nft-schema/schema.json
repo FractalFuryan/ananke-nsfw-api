@@ -1,0 +1,24 @@
+{
+  "name": "Ananke Seed",
+  "description": "Procedural generation rights for an Ananke geometry seed.",
+  "properties": {
+    "seed_hash": {
+      "type": "string",
+      "description": "SHA-256 hash of the nonce used to generate this seed"
+    },
+    "engine_version": {
+      "type": "string",
+      "description": "Version of ananke-core used for generation (e.g., '0.1.0')"
+    },
+    "constraints": {
+      "type": "object",
+      "description": "Bounded parameter constraints for this seed"
+    },
+    "revocable": {
+      "type": "boolean",
+      "const": true,
+      "description": "All Ananke seeds are revocable by design"
+    }
+  },
+  "required": ["seed_hash", "engine_version", "revocable"]
+}

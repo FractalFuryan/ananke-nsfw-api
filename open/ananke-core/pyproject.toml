@@ -1,0 +1,9 @@
+[project]
+name = "ananke-core"
+version = "0.1.0"
+description = "Geometry-first deterministic generator with hard ethical invariants."
+requires-python = ">=3.11"
+dependencies = []
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

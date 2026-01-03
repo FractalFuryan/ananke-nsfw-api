@@ -1,0 +1,10 @@
+{
+  "name": "Ananke Seed",
+  "description": "Procedural generation rights for an Ananke geometry seed.",
+  "properties": {
+    "seed_hash": {"type": "string"},
+    "engine_version": {"type": "string"},
+    "constraints": {"type": "object"},
+    "revocable": {"type": "boolean", "const": true}
+  }
+}

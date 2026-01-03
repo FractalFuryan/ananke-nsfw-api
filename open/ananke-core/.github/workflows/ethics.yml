@@ -1,0 +1,37 @@
+name: Ethics Drift Gate
+on: [push, pull_request]
+jobs:
+  ethics:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Verify ethics anchor
+        run: |
+          EXPECTED="65b14d584f5a5fd070fe985eeb86e14cb3ce56a4fc41fd9e987f2259fe1f15c1"
+          FOUND=$(grep -r "$EXPECTED" . --include="*.py" --include="*.md" | wc -l)
+          if [ "$FOUND" -lt 1 ]; then
+            echo "❌ Ethics anchor missing or modified"
+            exit 1
+          fi
+          echo "✓ Ethics anchor verified ($FOUND locations)"
+      
+      - name: Block realism / learning terms
+        run: |
+          if grep -R -nE "photoreal|skin|eyes|face|pose|train\(|fit\(|reinforcement|arousal|retention|engagement" ananke_core tests 2>/dev/null | grep -v "FORBIDDEN" | grep -v "# "; then
+            echo "❌ Forbidden concept detected"
+            exit 1
+          fi
+          echo "✓ No forbidden concepts"
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install -U pip pytest
+      
+      - name: Run tests
+        run: pytest -v tests/

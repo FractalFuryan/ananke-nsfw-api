@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  # Open-source core (base image for living-cipher)
+  ananke-core:
+    build:
+      context: ../open/ananke-core
+      dockerfile: Dockerfile
+    image: ananke-core:latest
+
+  # Proprietary Living Cipher service
+  living-cipher:
+    build:
+      context: ../proprietary/living-cipher
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      - billing
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Billing service (Stripe integration)
+  billing:
+    build:
+      context: ../proprietary/living-cipher/billing
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    environment:
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
+      - STRIPE_PRICE_ID=${STRIPE_PRICE_ID}
+      - SUCCESS_URL=${SUCCESS_URL:-http://localhost:3000/success}
+      - CANCEL_URL=${CANCEL_URL:-http://localhost:3000/cancel}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
